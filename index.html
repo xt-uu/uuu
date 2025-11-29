@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>💘 专属认亲挑战</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+KuaiLe&family=Microsoft+YaHei&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            transition: all 0.3s ease;
+            font-family: "Ma Shan Zheng", "ZCOOL+KuaiLe", "Microsoft YaHei", "SimHei", "Arial", sans-serif;
+        }
+        body {
+            height: 100vh;
+            background-image: url("https://picsum.photos/id/1069/1920/1080");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            padding: 0 15px;
+            background-color: #f0f8ff;
+            animation: pageFadeIn 1.5s ease forwards;
+        }
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.3);
+            z-index: -1;
+            animation: bgZoom 20s infinite alternate;
+        }
+        @keyframes bgZoom { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+        .corner-decoration {
+            position: absolute;
+            width: clamp(80px, 15vw, 150px);
+            height: clamp(80px, 15vw, 150px);
+            z-index: 1;
+            opacity: 0.6;
+            animation: patternRotate 8s infinite alternate ease-in-out;
+        }
+        @keyframes patternRotate { 0% { transform: rotate(-10deg) scale(0.95); } 100% { transform: rotate(10deg) scale(1.05); } }
+        .pattern-top-left { top: 20px; left: 20px; border-top: 5px solid #4299e1; border-left: 5px solid #4299e1; }
+        .pattern-top-right { top: 20px; right: 20px; border-top: 5px solid #4299e1; border-right: 5px solid #4299e1; }
+        .pattern-bottom-left { bottom: 20px; left: 20px; border-bottom: 5px solid #4299e1; border-left: 5px solid #4299e1; }
+        .pattern-bottom-right { bottom: 20px; right: 20px; border-bottom: 5px solid #4299e1; border-right: 5px solid #4299e1; }
+        .background-dots {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(#4299e133 2px, transparent 2px);
+            background-size: 30px 30px;
+            z-index: -1;
+            opacity: 0.5;
+            animation: dotsMove 15s infinite linear;
+        }
+        @keyframes dotsMove { 0% { background-position: 0 0; } 100% { background-position: 30px 30px; } }
+        .title {
+            font-size: clamp(28px, 7vw, 52px);
+            color: #4299e1;
+            margin-bottom: 40px;
+            text-align: center;
+            opacity: 0;
+            letter-spacing: 3px;
+            animation: titleFadeIn 1s 0.3s forwards, titlePulse 3s infinite alternate;
+            z-index: 10;
+            text-shadow: 0 0 10px rgba(135, 206, 250, 0.6), 0 2px 12px rgba(66, 153, 225, 0.4);
+        }
+        @keyframes titleFadeIn { to { opacity: 1; } }
+        @keyframes titlePulse {
+            0% { transform: scale(1); text-shadow: 0 0 10px rgba(135, 206, 250, 0.6); }
+            100% { transform: scale(1.05); text-shadow: 0 0 20px rgba(135, 206, 250, 0.8); }
+        }
+        .btn-container {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            margin-bottom: 30px;
+            z-index: 15;
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            align-items: center;
+        }
+        .choice-btn {
+            flex: 1;
+            padding: 18px 20px;
+            border: none;
+            border-radius: 40px;
+            font-size: clamp(22px, 5vw, 28px);
+            color: #ffffff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.8s ease, background 0.3s ease, box-shadow 0.3s ease;
+            will-change: transform, box-shadow;
+            box-shadow: 
+                0 8px 15px rgba(0, 0, 0, 0.2),
+                0 0 25px rgba(135, 206, 250, 0.3) inset,
+                0 2px 5px rgba(255, 255, 255, 0.7) inset;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 50;
+            min-width: 120px;
+        }
+        .choice-btn::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 5%;
+            width: 90%;
+            height: 40%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .choice-btn:hover::after { opacity: 1; }
+        #agreeBtn {
+            background: linear-gradient(135deg, #b3e5fc 0%, #81d4fa 30%, #4fc3f7 100%);
+            animation: agreePulse 2s infinite alternate;
+        }
+        @keyframes agreePulse {
+            0% { box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2), 0 0 25px rgba(135, 206, 250, 0.3) inset; }
+            100% { box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25), 0 0 35px rgba(135, 206, 250, 0.5) inset; }
+        }
+        #disagreeBtn {
+            background: linear-gradient(135deg, #64b5f6 0%, #4299e1 30%, #3182ce 100%);
+            box-shadow: 
+                0 8px 15px rgba(0, 0, 0, 0.2),
+                0 0 25px rgba(66, 153, 225, 0.3) inset,
+                0 2px 5px rgba(255, 255, 255, 0.7) inset;
+        }
+        #disagreeBtn.sync-agree {
+            background: linear-gradient(135deg, #b3e5fc 0%, #81d4fa 30%, #4fc3f7 100%);
+            box-shadow: 
+                0 8px 15px rgba(0, 0, 0, 0.2),
+                0 0 25px rgba(135, 206, 250, 0.3) inset,
+                0 2px 5px rgba(255, 255, 255, 0.7) inset;
+        }
+        #agreeBtn.enlarge1 {
+            transform: scale(1.2);
+            box-shadow: 
+                0 10px 20px rgba(0,0,0,0.25), 
+                0 0 40px rgba(135, 206, 250, 0.5),
+                0 2px 5px rgba(255, 255, 255, 0.7) inset;
+            z-index: 60;
+            animation: breathe 1.5s infinite alternate;
+            opacity: 1 !important;
+        }
+        #agreeBtn.enlarge2 {
+            transform: scale(1.4);
+            box-shadow: 
+                0 12px 25px rgba(0,0,0,0.3), 
+                0 0 50px rgba(135, 206, 250, 0.6),
+                0 2px 5px rgba(255, 255, 255, 0.7) inset;
+            z-index: 60;
+            animation: breathe2 1s infinite alternate;
+            opacity: 1 !important;
+        }
+        @keyframes breathe {
+            0% { transform: scale(1.2); box-shadow: 0 10px 20px rgba(0,0,0,0.25), 0 0 40px rgba(135, 206, 250, 0.5), 0 2px 5px rgba(255, 255, 255, 0.7) inset; }
+            100% { transform: scale(1.25); box-shadow: 0 12px 22px rgba(0,0,0,0.3), 0 0 45px rgba(135, 206, 250, 0.6), 0 2px 5px rgba(255, 255, 255, 0.7) inset; }
+        }
+        @keyframes breathe2 {
+            0% { transform: scale(1.4); box-shadow: 0 12px 25px rgba(0,0,0,0.3), 0 0 50px rgba(135, 206, 250, 0.6), 0 2px 5px rgba(255, 255, 255, 0.7) inset; }
+            100% { transform: scale(1.45); box-shadow: 0 14px 28px rgba(0,0,0,0.35), 0 0 55px rgba(135, 206, 250, 0.7), 0 2px 5px rgba(255, 255, 255, 0.7) inset; }
+        }
+        .choice-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 
+                0 12px 20px rgba(0, 0, 0, 0.25), 
+                0 0 40px rgba(135, 206, 250, 0.6),
+                0 2px 5px rgba(255, 255, 255, 0.7) inset;
+        }
+        #disagreeBtn:not(.sync-agree):hover {
+            box-shadow: 
+                0 12px 20px rgba(0, 0, 0, 0.25), 
+                0 0 40px rgba(66, 153, 225, 0.6),
+                0 2px 5px rgba(255, 255, 255, 0.7) inset;
+        }
+        .choice-btn:active {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 
+                0 6px 12px rgba(0, 0, 0, 0.2), 
+                0 0 25px rgba(135, 206, 250, 0.4),
+                0 1px 3px rgba(255, 255, 255, 0.7) inset;
+            background: linear-gradient(135deg, #90caf9 0%, #64b5f6 30%, #42a5f5 100%);
+        }
+        #disagreeBtn:not(.sync-agree):active {
+            box-shadow: 
+                0 6px 12px rgba(0, 0, 0, 0.2), 
+                0 0 25px rgba(66, 153, 225, 0.4),
+                0 1px 3px rgba(255, 255, 255, 0.7) inset;
+            background: linear-gradient(135deg, #54a0ff 0%, #3b7dca 30%, #2962ff 100%);
+        }
+        .success-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            z-index: 1001;
+            text-align: center;
+            padding: 20px 15px;
+            border-radius: 20px;
+            width: clamp(120px, 25vw, 200px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 30px rgba(135, 206, 250, 0.3);
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.85);
+            will-change: transform, opacity;
+        }
+        .success-popup.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25), 0 0 40px rgba(135, 206, 250, 0.4);
+            animation: popupBounce 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes popupBounce {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        .success-popup.final {
+            width: clamp(180px, 35vw, 280px);
+            padding: 30px 20px;
+            z-index: 1002;
+            box-shadow: 0 0 30px rgba(255, 193, 7, 0.8), 0 20px 50px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.98);
+            animation: finalPopupPulse 1.5s infinite alternate, finalPopupHighlight 0.5s forwards;
+        }
+        @keyframes finalPopupHighlight {
+            0% { transform: translate(-50%, -50%) scale(0.9); box-shadow: 0 0 10px rgba(255, 193, 7, 0.5); }
+            100% { transform: translate(-50%, -50%) scale(1.05); box-shadow: 0 0 30px rgba(255, 193, 7, 0.8), 0 20px 50px rgba(0, 0, 0, 0.3); }
+        }
+        .final .popup-content {
+            font-size: clamp(22px, 4.5vw, 28px);
+            color: #e67e22;
+            text-shadow: 0 2px 15px rgba(255, 152, 0, 0.8), 0 0 20px rgba(255, 193, 7, 0.6);
+            animation: textBlink 1.5s infinite alternate;
+        }
+        @keyframes textBlink {
+            0% { text-shadow: 0 2px 10px rgba(255, 152, 0, 0.4); }
+            100% { text-shadow: 0 2px 15px rgba(255, 152, 0, 0.8), 0 0 10px rgba(255, 193, 7, 0.5); }
+        }
+        .sad-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            z-index: 1001;
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), 0 0 30px rgba(186, 230, 253, 0.3);
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.85);
+        }
+        .sad-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25), 0 0 40px rgba(186, 230, 253, 0.4);
+        }
+        .sad-emoji {
+            font-size: clamp(60px, 15vw, 120px);
+            margin-bottom: 15px;
+            animation: emojiBounce 0.5s ease, emojiShake 2s infinite alternate;
+        }
+        @keyframes emojiBounce { 0% { transform: scale(0); } 70% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes emojiShake { 0% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.05) rotate(2deg); } 100% { transform: scale(1) rotate(-2deg); } }
+        .sad-text {
+            font-size: clamp(22px, 5vw, 32px);
+            color: #4299e1;
+            line-height: 1.6;
+            text-shadow: 0 1px 8px rgba(66, 153, 225, 0.3);
+            letter-spacing: 2px;
+        }
+        .emoji {
+            background: none;
+            -webkit-background-clip: none;
+            background-clip: none;
+            color: #ffb74d;
+        }
+        .level-up {
+            position: fixed;
+            top: 10%;
+            right: -300px;
+            z-index: 50;
+            background: linear-gradient(135deg, #a8d8ff 0%, #81d4fa 50%, #b3e5fc 100%);
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: clamp(18px, 4vw, 26px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(255, 255, 255, 0.7) inset;
+            transition: right 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: right;
+            animation: levelBlink 2s infinite alternate;
+            letter-spacing: 1px;
+        }
+        .level-up::before { content: "✨"; margin-right: 8px; }
+        @keyframes levelBlink {
+            0% { opacity: 0.9; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 2px 5px rgba(255, 255, 255, 0.7) inset; }
+            100% { opacity: 1; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 2px 5px rgba(255, 255, 255, 0.9) inset; }
+        }
+        .level-up.active { right: 10px; }
+        .happy-emoji {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: clamp(150px, 30vw, 280px);
+            color: #81d4fa;
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 100;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s ease;
+            animation: emojiRotate 2s infinite alternate;
+            text-shadow: 0 0 30px rgba(135, 206, 250, 0.8);
+        }
+        @keyframes emojiRotate {
+            0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) scale(1.05) rotate(10deg); }
+        }
+        .happy-emoji.active { transform: translate(-50%, -50%) scale(1); }
+        .happy-emoji.fade-out { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        .explosion-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 50;
+            border-radius: 50%;
+            opacity: 1;
+            will-change: transform, opacity;
+            background: #81d4fa;
+        }
+        @keyframes btnVibrate {
+            0% { transform: translateX(0) translateY(0); }
+            20% { transform: translateX(-2px) translateY(-2px); }
+            40% { transform: translateX(2px) translateY(2px); }
+            60% { transform: translateX(-2px) translateY(2px); }
+            80% { transform: translateX(2px) translateY(-2px); }
+            100% { transform: translateX(0) translateY(0); }
+        }
+        .vibrate { animation: btnVibrate 0.2s ease-in-out; }
+        @keyframes textFadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .text-animate span { display: inline-block; animation: textFadeIn 0.3s forwards; }
+        @keyframes explosion {
+            0% { transform: scale(1) translate(0, 0); opacity: 1; }
+            100% { transform: scale(0.5) translate(var(--dx), var(--dy)); opacity: 0; }
+        }
+        @keyframes btnShake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-5px); }
+            40% { transform: translateX(5px); }
+            60% { transform: translateX(-3px); }
+            80% { transform: translateX(3px); }
+            100% { transform: translateX(0); }
+        }
+        /* 音乐控制区样式 */
+        .music-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(8px);
+        }
+        .music-btn {
+            width: clamp(50px, 10vw, 70px);
+            height: clamp(50px, 10vw, 70px);
+            border-radius: 50%;
+            background: linear-gradient(135deg, #b3e5fc 0%, #81d4fa 100%);
+            color: #ffffff;
+            border: none;
+            font-size: clamp(24px, 5vw, 32px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), 0 0 15px rgba(135, 206, 250, 0.4) inset;
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .music-btn.playing { animation: musicRotate 3s infinite linear; }
+        @keyframes musicRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* 暂停状态按钮高亮反馈 */
+        .music-btn:not(.playing) {
+            box-shadow: 0 0 20px rgba(255, 99, 71, 0.6), 0 4px 12px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, #ffcccb 0%, #ff6b6b 100%);
+        }
+        .music-btn:hover { transform: scale(1.1); }
+        .music-btn:active { 
+            transform: scale(0.95); 
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        /* 进度条样式（新增暂停状态变色） */
+        .progress-container {
+            width: clamp(120px, 25vw, 200px);
+            height: 8px;
+            background: rgba(135, 206, 250, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #81d4fa 0%, #4299e1 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease, background 0.3s ease;
+            box-shadow: 0 0 10px rgba(135, 206, 250, 0.8);
+        }
+        /* 暂停时进度条变色 */
+        .progress-container.paused .progress-bar {
+            background: linear-gradient(90deg, #ff6b6b 0%, #ff4757 100%);
+            box-shadow: 0 0 10px rgba(255, 99, 71, 0.8);
+        }
+        .time-display {
+            font-size: clamp(12px, 2vw, 14px);
+            color: #4299e1;
+            text-align: center;
+            margin-top: 5px;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        /* 暂停时时间文本变色 */
+        .progress-container.paused + .time-display {
+            color: #ff4757;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-dots"></div>
+    <div class="corner-decoration pattern-top-left"></div>
+    <div class="corner-decoration pattern-top-right"></div>
+    <div class="corner-decoration pattern-bottom-left"></div>
+    <div class="corner-decoration pattern-bottom-right"></div>
+    <h1 class="title">你愿意做我的erzi吗？</h1>
+    <div class="btn-container">
+        <button class="choice-btn" id="agreeBtn">愿意</button>
+        <button class="choice-btn" id="disagreeBtn">不愿意</button>
+    </div>
+    <div class="sad-modal" id="sadModal">
+        <div class="sad-emoji">😭</div>
+        <div class="sad-text text-animate">确定么<span class="emoji">😭</span></div>
+    </div>
+    <!-- 音乐控制区（含进度条） -->
+    <div class="music-control">
+        <button class="music-btn playing" id="musicBtn">⏸️</button>
+        <div>
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+        </div>
+    </div>
+    <!-- 本地音乐：ff文件夹下的mm.mp3 -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="ff/mm.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放
+    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取所有核心元素
+            const elements = {
+                agreeBtn: document.getElementById("agreeBtn"),
+                disagreeBtn: document.getElementById("disagreeBtn"),
+                sadModal: document.getElementById("sadModal"),
+                musicBtn: document.getElementById("musicBtn"),
+                bgMusic: document.getElementById("bgMusic"),
+                progressContainer: document.getElementById("progressContainer"),
+                progressBar: document.getElementById("progressBar"),
+                timeDisplay: document.getElementById("timeDisplay")
+            };
+
+            // 检查元素是否存在，避免报错
+            if (!elements.agreeBtn || !elements.disagreeBtn || !elements.musicBtn || !elements.bgMusic || !elements.progressContainer || !elements.progressBar || !elements.timeDisplay) {
+                console.error("核心元素未找到，请检查HTML结构！");
+                return;
+            }
+
+            // 状态管理
+            const state = {
+                disagreeClickCount: 0,
+                sadModalTimer: null,
+                emojiTimer: null,
+                isAnimating: false,
+                popupCount: 15,
+                popupDelay: 150,
+                finalPopupDelay: 12000,
+                isMusicPlaying: true // 初始为播放状态
+            };
+
+            // 弹窗文本
+            const POPUP_TEXT = "耶！你以后就是我的爱子了，哈哈！😜😜😜😁";
+
+            // 按钮震动效果
+            function triggerVibration(btn) {
+                btn.classList.add('vibrate');
+                setTimeout(() => btn.classList.remove('vibrate'), 200);
+                if (window.navigator.vibrate) navigator.vibrate([20, 10, 20]);
+            }
+
+            // 格式化时间（秒转分:秒）
+            function formatTime(seconds) {
+                const min = Math.floor(seconds / 60);
+                const sec = Math.floor(seconds % 60);
+                return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+            }
+
+            // 更新音乐进度条和时间显示
+            function updateProgress() {
+                const duration = elements.bgMusic.duration || 0;
+                const currentTime = elements.bgMusic.currentTime || 0;
+                const progressPercent = (currentTime / duration) * 100;
+                elements.progressBar.style.width = `${progressPercent}%`;
+                elements.timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+            }
+
+            // 拖动进度条调整播放位置
+            function seekProgress(e) {
+                const containerRect = elements.progressContainer.getBoundingClientRect();
+                const clickPosition = (e.clientX - containerRect.left) / containerRect.width;
+                const duration = elements.bgMusic.duration || 0;
+                elements.bgMusic.currentTime = clickPosition * duration;
+                updateProgress();
+            }
+
+            // 音乐播放/暂停控制（新增暂停状态视觉切换）
+            function toggleMusic() {
+                if (state.isMusicPlaying) {
+                    // 暂停音乐：更新视觉状态
+                    elements.bgMusic.pause();
+                    elements.musicBtn.innerText = "▶️";
+                    elements.musicBtn.classList.remove('playing');
+                    elements.progressContainer.classList.add('paused'); // 进度条加暂停类
+                } else {
+                    // 播放音乐：恢复视觉状态
+                    elements.bgMusic.play().catch(err => {
+                        console.error("音乐播放失败：", err);
+                        alert("音乐文件加载失败，请确认：\n1. ff文件夹与HTML文件在同一目录\n2. 音乐文件名为mm.mp3（大小写敏感）\n3. 文件格式为MP3");
+                    });
+                    elements.musicBtn.innerText = "⏸️";
+                    elements.musicBtn.classList.add('playing');
+                    elements.progressContainer.classList.remove('paused'); // 移除暂停类
+                }
+                state.isMusicPlaying = !state.isMusicPlaying;
+            }
+
+            // 页面加载完成后自动播放音乐
+            function autoPlayMusic() {
+                elements.bgMusic.play().catch(err => {
+                    console.log("自动播放被浏览器限制，点击页面后可手动播放：", err);
+                    // 若自动播放失败，提示用户点击页面后手动播放
+                    document.body.addEventListener('click', () => {
+                        if (!state.isMusicPlaying) toggleMusic();
+                    }, { once: true });
+                });
+            }
+
+            // 工具函数
+            const utils = {
+                getClientPos(e) {
+                    if (e.touches && e.touches[0]) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                    return { x: e.clientX || window.innerWidth / 2, y: e.clientY || window.innerHeight / 2 };
+                },
+                removeAllElements(className) {
+                    document.querySelectorAll(`.${className}`).forEach(el => el.remove());
+                },
+                initBtnEntry() {
+                    // 按钮渐入动画
+                    setTimeout(() => {
+                        elements.agreeBtn.style.opacity = 1;
+                        elements.agreeBtn.style.transform = 'translateY(0)';
+                    }, 500);
+                    setTimeout(() => {
+                        elements.disagreeBtn.style.opacity = 1;
+                        elements.disagreeBtn.style.transform = 'translateY(0)';
+                    }, 800);
+                },
+                getRandomPos() {
+                    const x = Math.random() * 85 + 7.5;
+                    const y = Math.random() * 85 + 7.5;
+                    return { x: `${x}%`, y: `${y}%` };
+                },
+                getCenterPos() { return { x: '50%', y: '50%' }; }
+            };
+
+            // 特效函数
+            const effects = {
+                showLevelUp(text) {
+                    utils.removeAllElements("level-up");
+                    const level = document.createElement("div");
+                    level.className = "level-up";
+                    level.innerText = text;
+                    document.body.appendChild(level);
+                    setTimeout(() => level.classList.add("active"), 100);
+                    setTimeout(() => level.remove(), 2000);
+                },
+                showHappyEmoji(callback) {
+                    utils.removeAllElements("happy-emoji");
+                    const emoji = document.createElement("div");
+                    emoji.className = "happy-emoji";
+                    emoji.innerText = "😆";
+                    document.body.appendChild(emoji);
+                    setTimeout(() => emoji.classList.add("active"), 100);
+                    state.emojiTimer = setTimeout(() => {
+                        emoji.classList.add("fade-out");
+                        setTimeout(() => { emoji.remove(); callback && callback(); }, 600);
+                    }, 1500);
+                },
+                createExplosion(x, y, count = 10, color = '#a8d8ff') {
+                    for (let i = 0; i < count; i++) {
+                        const particle = document.createElement("div");
+                        particle.className = "explosion-particle";
+                        const size = Math.random() * 6 + 2;
+                        const angle = Math.random() * Math.PI * 2;
+                        const distance = Math.random() * 30 + 10;
+                        const dx = Math.cos(angle) * distance;
+                        const dy = Math.sin(angle) * distance;
+                        particle.style.width = `${size}px`;
+                        particle.style.height = `${size}px`;
+                        particle.style.left = `${x - size/2}px`;
+                        particle.style.top = `${y - size/2}px`;
+                        particle.style.background = color;
+                        particle.style.setProperty('--dx', `${dx}px`);
+                        particle.style.setProperty('--dy', `${dy}px`);
+                        particle.style.animation = `explosion 0.6s forwards ease-out`;
+                        document.body.appendChild(particle);
+                        setTimeout(() => particle.remove(), 600);
+                    }
+                },
+                shakeButton(btn) {
+                    const originalAnimation = btn.style.animation;
+                    btn.style.animation = 'btnShake 0.5s ease';
+                    setTimeout(() => btn.style.animation = originalAnimation, 500);
+                },
+                createPopup(index) {
+                    const popup = document.createElement("div");
+                    popup.className = "success-popup";
+                    if (index === state.popupCount - 1) {
+                        popup.classList.add("final");
+                    }
+                    let pos = index === state.popupCount - 1 ? utils.getCenterPos() : utils.getRandomPos();
+                    popup.style.top = pos.y;
+                    popup.style.left = pos.x;
+                    const scale = index === state.popupCount - 1 ? 1 : (0.8 + Math.random() * 0.4);
+                    popup.style.transform = `translate(-50%, -50%) scale(${scale * 0.9})`;
+                    const content = document.createElement("div");
+                    content.className = "popup-content text-animate";
+                    content.innerText = POPUP_TEXT;
+                    popup.appendChild(content);
+                    document.body.appendChild(popup);
+                    requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            popup.classList.add("active");
+                            animateText(content);
+                            if (index !== state.popupCount - 1) {
+                                setTimeout(() => {
+                                    popup.classList.remove("active");
+                                    setTimeout(() => popup.remove(), 300);
+                                }, 2000);
+                            } else {
+                                setTimeout(() => {
+                                    popup.classList.remove("active");
+                                    setTimeout(() => popup.remove(), 300);
+                                }, state.finalPopupDelay + 3000);
+                            }
+                        }, index * state.popupDelay);
+                    });
+                },
+                createMultiPopups() {
+                    utils.removeAllElements("success-popup");
+                    for (let i = 0; i < state.popupCount; i++) {
+                        this.createPopup(i);
+                    }
+                }
+            };
+
+            // 文本逐字动画
+            function animateText(element) {
+                const text = element.textContent;
+                element.textContent = '';
+                [...text].forEach((char, index) => {
+                    const span = document.createElement('span');
+                    span.textContent = char;
+                    span.style.animationDelay = `${index * 0.1}s`;
+                    element.appendChild(span);
+                });
+            }
+
+            // 同意按钮点击处理
+            function handleSuccess(e) {
+                if (state.isAnimating) return;
+                state.isAnimating = true;
+                triggerVibration(e.target);
+                // 播放音乐（若未播放）
+                setTimeout(() => {
+                    if (!state.isMusicPlaying) toggleMusic();
+                }, 300);
+                // 显示开心表情
+                setTimeout(() => {
+                    effects.showHappyEmoji(() => {
+                        effects.createMultiPopups();
+                        // 重置动画状态
+                        const totalDuration = (state.popupCount - 1) * state.popupDelay + 2000 + state.finalPopupDelay + 6000;
+                        setTimeout(() => state.isAnimating = false, totalDuration);
+                    });
+                }, 500);
+                // 爆炸效果和提示
+                const { x, y } = utils.getClientPos(e);
+                setTimeout(() => {
+                    effects.showLevelUp("认亲成功！");
+                    effects.createExplosion(x, y, 10, '#a8d8ff');
+                    effects.shakeButton(e.target);
+                }, 800);
+            }
+
+            // 事件处理函数
+            const handlers = {
+                agreeClick(e) { handleSuccess(e); },
+                disagreeClick(e) {
+                    if (state.isAnimating) return;
+                    state.isAnimating = true;
+                    triggerVibration(e.target);
+                    utils.removeAllElements("success-popup");
+                    clearTimeout(state.sadModalTimer);
+                    // 爆炸效果
+                    const { x, y } = utils.getClientPos(e);
+                    effects.createExplosion(x, y, 8, '#4299e1');
+                    effects.shakeButton(e.target);
+                    // 第一次拒绝
+                    if (state.disagreeClickCount < 2) {
+                        if (state.disagreeClickCount === 0) {
+                            elements.agreeBtn.classList.add('enlarge1');
+                            effects.showLevelUp("再考虑下？");
+                        } else {
+                            elements.agreeBtn.classList.remove('enlarge1');
+                            elements.agreeBtn.classList.add('enlarge2');
+                            effects.showLevelUp("真的要拒绝吗？");
+                        }
+                        // 显示悲伤弹窗
+                        elements.sadModal.classList.add("active");
+                        animateText(elements.sadModal.querySelector('.sad-text'));
+                        // 关闭弹窗
+                        state.sadModalTimer = setTimeout(() => {
+                            elements.sadModal.classList.remove("active");
+                            state.isAnimating = false;
+                        }, 2000);
+                        // 更新按钮文本和透明度
+                        elements.disagreeBtn.innerText = state.disagreeClickCount === 0 ? "确定吗？" : "真的确定吗？";
+                        elements.disagreeBtn.style.opacity = state.disagreeClickCount === 0 ? 0.7 : 0.5;
+                        state.disagreeClickCount++;
+                    } else {
+                        // 第三次点击，转为同意
+                        elements.disagreeBtn.classList.add('sync-agree');
+                        elements.disagreeBtn.innerText = "愿意";
+                        elements.disagreeBtn.style.opacity = 1;
+                        elements.agreeBtn.classList.remove('enlarge1', 'enlarge2');
+                        effects.showLevelUp("最终同意！");
+                        effects.createExplosion(x, y, 10, '#a8d8ff');
+                        // 显示开心表情和弹窗
+                        effects.showHappyEmoji(() => {
+                            effects.createMultiPopups();
+                            const totalDuration = (state.popupCount - 1) * state.popupDelay + 2000 + state.finalPopupDelay + 3000;
+                            setTimeout(() => {
+                                elements.disagreeBtn.removeEventListener("click", handlers.disagreeClick);
+                                elements.disagreeBtn.addEventListener("click", handleSuccess);
+                                state.isAnimating = false;
+                            }, totalDuration);
+                        });
+                    }
+                }
+            };
+
+            // 初始化页面
+            utils.initBtnEntry();
+            autoPlayMusic(); // 页面加载完成后自动播放音乐
+            
+            // 绑定事件
+            elements.agreeBtn.addEventListener("click", handlers.agreeClick);
+            elements.disagreeBtn.addEventListener("click", handlers.disagreeClick);
+            elements.musicBtn.addEventListener("click", toggleMusic);
+            elements.progressContainer.addEventListener("click", seekProgress);
+            // 音乐播放进度更新
+            elements.bgMusic.addEventListener("timeupdate", updateProgress);
+            // 音乐加载完成后更新总时长
+            elements.bgMusic.addEventListener("loadedmetadata", updateProgress);
+
+            // 触摸事件支持
+            elements.agreeBtn.addEventListener("touchstart", handlers.agreeClick);
+            elements.disagreeBtn.addEventListener("touchstart", handlers.disagreeClick);
+            elements.musicBtn.addEventListener("touchstart", toggleMusic);
+            elements.progressContainer.addEventListener("touchstart", (e) => {
+                e.preventDefault();
+                seekProgress(e.touches[0]);
+            });
+
+            // 页面加载完成后预加载本地音频
+            document.body.addEventListener('click', () => {
+                if (!state.isMusicPlaying && elements.bgMusic.paused) {
+                    elements.bgMusic.load(); // 预加载本地音频，提升播放速度
+                }
+            }, { once: true });
+        });
+    </script>
+</body>
+</html>
